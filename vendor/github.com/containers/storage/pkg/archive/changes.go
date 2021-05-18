@@ -18,6 +18,7 @@ import (
 	"github.com/containers/storage/pkg/pools"
 	"github.com/containers/storage/pkg/system"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/sys/unix"
 )
 
 // ChangeType represents the change type.
@@ -120,6 +121,9 @@ func aufsWhiteoutPresent(root, path string) (bool, error) {
 func isENOTDIR(err error) bool {
 	if err == nil {
 		return false
+	}
+	if err == syscall.ENOTDIR || err == unix.ENOTDIR {
+		return true
 	}
 	if perror, ok := err.(*os.PathError); ok {
 		if errno, ok := perror.Err.(syscall.Errno); ok {
